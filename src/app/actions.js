@@ -1,4 +1,5 @@
-const api = 'https://bricks-game.herokuapp.com';
+// const api = 'https://bricks-game.herokuapp.com';
+const api = 'http://localhost:5050';
 
 export const loadLobbies = () => async (dispatch) => {
     const response = await fetch(api);
@@ -54,7 +55,7 @@ export const loadGame = ({ id }) => async (dispatch) => {
             blocks: e.brick.blocks
         }));
 
-    const { game: { winner: { name: winner }}} = events
+    const { result: { player: { name: winner }}} = events
         .find(e => e.type === 'GameEndedEvent')
         .rawPayload;
 

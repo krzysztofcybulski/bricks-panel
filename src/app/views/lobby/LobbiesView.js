@@ -9,7 +9,8 @@ import NewLobbyCard from './NewLobbyCard';
 const LobbiesView = ({ loading, lobbies, loadLobbies }) => {
 
     useEffect(() => {
-        loadLobbies();
+        const interval = setInterval(() => loadLobbies(), 1500);
+        return () => clearInterval(interval);
     }, [loadLobbies]);
 
     if (loading) {
@@ -18,11 +19,11 @@ const LobbiesView = ({ loading, lobbies, loadLobbies }) => {
 
     return <Box direction="row" alignContent="center" wrap fill={true} pad="xlarge">
         {lobbies.map(lobby =>
-            <Box key={lobby.name} width="30%" margin="medium" flex="shrink">
+            <Box key={lobby.name} width="30%" margin="1.66%" flex="shrink">
                 <LobbyCard lobby={lobby}/>
             </Box>
         )}
-        <Box margin="medium" width="30%" fill={false} flex="shrink">
+        <Box margin="1%" width="30%" fill={false} flex="shrink">
             <NewLobbyCard/>
         </Box>
     </Box>;
