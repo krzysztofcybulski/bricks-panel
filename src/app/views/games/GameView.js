@@ -10,7 +10,7 @@ import textToColor from '../../textToColor';
 const Player = ({ name, winner }) =>
     <Box align="center" justify="between" direction="column" gap="small">
         <Avatar align="center" flex={false} justify="center" overflow="hidden" round="full"
-                src={`https://identicon-api.herokuapp.com/${name}/64?format=png`}/>
+                src={`https://identicon-api.herokuapp.com/${name.replaceAll(" ", "-")}/64?format=png`}/>
         <Box align="center" justify="center" direction="row" gap="small">
             <Paragraph color={textToColor(name)}>{name}</Paragraph>
             {winner === name && <Trophy/>}

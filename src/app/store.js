@@ -3,7 +3,8 @@ import thunk from 'redux-thunk';
 
 const gameReducer = (state = {
     lobbies: null,
-    game: null
+    game: null,
+    bots: []
 }, action) => {
     switch (action.type) {
         case 'LOBBIES_LOADED':
@@ -20,6 +21,11 @@ const gameReducer = (state = {
             return {
                 ...state,
                 game: action.game
+            };
+        case 'BOTS_LOADED':
+            return {
+                ...state,
+                bots: action.bots
             };
         default:
             return state;

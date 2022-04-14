@@ -1,17 +1,21 @@
 import { Box, Spinner } from 'grommet';
 import LobbyCard from './LobbyCard';
 import { useEffect } from 'react';
-import { loadLobbies } from '../../actions';
+import { loadBotNames, loadLobbies } from '../../actions';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 
 
-const LobbiesView = ({ loading, lobbies, loadLobbies }) => {
+const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots }) => {
 
     useEffect(() => {
         const interval = setInterval(() => loadLobbies(), 1500);
         return () => clearInterval(interval);
     }, [loadLobbies]);
+
+    useEffect(() => {
+        loadBots();
+    }, [loadBots]);
 
     if (loading) {
         return <Spinner alignSelf='center'/>;
@@ -35,6 +39,7 @@ export default connect(
         lobbies: state.lobbies
     }),
     dispatch => ({
-        loadLobbies: () => dispatch(loadLobbies())
+        loadLobbies: () => dispatch(loadLobbies()),
+        loadBots: () => dispatch(loadBotNames())
     }))
 (LobbiesView);

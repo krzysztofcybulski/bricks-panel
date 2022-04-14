@@ -1,21 +1,10 @@
-import {
-    Accordion,
-    AccordionPanel,
-    Avatar,
-    Box,
-    Button,
-    Card,
-    CardBody,
-    Paragraph,
-    Select,
-    Spinner,
-    TextInput
-} from 'grommet';
-import { Copy, Lock, Trophy } from 'grommet-icons';
+import { Accordion, AccordionPanel, Avatar, Box, Button, Card, CardBody, Paragraph, Select, Spinner } from 'grommet';
+import { Copy, Lock } from 'grommet-icons';
 import { connect } from 'react-redux';
 import { loadLobbies, startTournament } from '../../actions';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import BotSelector from './BotSelector';
 
 const PlayersList = ({ playerNames, points }) => <Accordion animate>
     <AccordionPanel label="Players">
@@ -26,7 +15,7 @@ const PlayersList = ({ playerNames, points }) => <Accordion animate>
                         justify="center"
                         overflow="hidden"
                         round="full"
-                        src={`https://identicon-api.herokuapp.com/${player}/64?format=png`}/>
+                        src={`https://identicon-api.herokuapp.com/${player.replaceAll(' ', '-')}/64?format=png`}/>
                 <Box align="center" justify="between" direction="row" gap="small">
                     <Paragraph>{player}</Paragraph>
                     <Paragraph>{points[player]}</Paragraph>
@@ -43,7 +32,7 @@ const GamesList = ({ games, goToGame }) => {
     const [players, setPlayers] = useState([]);
 
     useEffect(() => {
-        if(filter === 'All players') {
+        if (filter === 'All players') {
             setFilteredGames(games);
         } else {
             setFilteredGames(games.filter(({ players }) => players.indexOf(filter) >= 0));
@@ -61,9 +50,10 @@ const GamesList = ({ games, goToGame }) => {
                 value={filter}
                 onChange={({ option }) => setFilter(option)}
             />
-            <Box style={{ height: '320px', overflowY: 'scroll' }} pad='small'>
+            <Box style={{ height: '320px', overflowY: 'scroll' }} pad="small">
                 {filteredGames.map(({ id, size, players, winner }) =>
-                    <Box key={id} align="center" justify="between" direction="row" gap="small" style={{ minHeight: '45px'}} border={{ side: 'bottom' }}>
+                    <Box key={id} align="center" justify="between" direction="row" gap="small"
+                         style={{ minHeight: '45px' }} border={{ side: 'bottom' }}>
                         <Paragraph>
                             {winner === players[0] ? <b>{players[0]}</b> : players[0]}
                             &nbsp;vs&nbsp;
@@ -77,7 +67,7 @@ const GamesList = ({ games, goToGame }) => {
     </Accordion>;
 };
 
-const LobbyCard = ({ lobby: { name, status, games, points, playerNames }, startTournament }) =>
+const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, startTournament }) =>
     <Card background={{ 'color': 'white' }} fill="horizontal" pad="medium" width="medium" align="stretch">
         <Box align="end" justify="center">
             {status !== 'OPEN' && <Lock/>}
@@ -91,6 +81,7 @@ const LobbyCard = ({ lobby: { name, status, games, points, playerNames }, startT
                 <Paragraph>{name}</Paragraph>
                 <Copy onClick={() => navigator.clipboard.writeText(name)} cursor="pointer"/>
             </Box>
+            {status === 'OPEN' && <BotSelector lobby={name}/>}
             {playerNames.length > 0 && <PlayersList playerNames={playerNames} points={points}/>}
             {games.length > 0 && <GamesList games={games}/>}
             {status === 'IN_GAME' && <Spinner alignSelf="center"/>}
@@ -109,7 +100,8 @@ const LobbyCard = ({ lobby: { name, status, games, points, playerNames }, startT
 
 
 export default connect(
-    (state, props) => ({
+    ({ bots }, props) => ({
+        bots,
         ...props
     }),
     dispatch => ({

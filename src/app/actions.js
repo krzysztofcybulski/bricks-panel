@@ -10,6 +10,15 @@ export const loadLobbies = () => async (dispatch) => {
     });
 };
 
+export const loadBotNames = () => async (dispatch) => {
+    const response = await fetch(`${api}/bots`);
+    const bots = await response.json();
+    await dispatch({
+        type: 'BOTS_LOADED',
+        bots
+    });
+};
+
 export const startTournament = ({ lobby }) => async (dispatch) => {
     await fetch(`${api}/${lobby}/start`, {
         method: 'POST' ,
@@ -30,6 +39,18 @@ export const createNewLobby = () => async (dispatch) => {
     dispatch(loadLobbies());
 };
 
+export const addBot = ({ lobby, name }) => async (dispatch) => {
+    await fetch(`${api}/${lobby}/bots`, {
+        method: 'POST' ,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name
+        })
+    });
+    dispatch(loadLobbies());
+};
 
 export const loadGame = ({ id }) => async (dispatch) => {
     await dispatch({
