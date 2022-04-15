@@ -1,5 +1,4 @@
-// const api = 'https://bricks-game.herokuapp.com';
-const api = 'http://localhost:5050';
+const api = process.env.API || 'http://localhost:5050';
 
 export const loadLobbies = () => async (dispatch) => {
     const response = await fetch(api);
