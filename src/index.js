@@ -9,16 +9,6 @@ import App from './App';
 import LobbiesView from './app/views/lobby/LobbiesView';
 import GameView from './app/views/games/GameView';
 
-const theme = {
-    // global: {
-    //     font: {
-    //         family: 'Roboto',
-    //         size: '18px',
-    //         height: '20px'
-    //     }
-    // }
-};
-
 ReactDOM.render(
     <React.StrictMode>
         <Provider store={store}>
