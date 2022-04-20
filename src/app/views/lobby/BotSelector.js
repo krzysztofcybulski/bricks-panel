@@ -11,15 +11,17 @@ const BotSelector = ({ botNames, addBot }) => {
     }, [botNames]);
 
     return <Box direction="row" gap="medium">
-        <Select
-            options={botNames}
-            value={bot}
-            onChange={({ option }) => setBot(option)}
-        />
+        <Box flex="grow">
+            <Select
+                options={botNames}
+                value={bot}
+                onChange={({ option }) => setBot(option)}
+                flex='grow'
+            />
+        </Box>
         <Button label="Add" onClick={() => addBot({ name: bot })} plain/>
     </Box>;
 };
-
 
 export default connect(
     ({ bots }) => ({

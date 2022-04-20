@@ -1,34 +1,51 @@
 import { Accordion, AccordionPanel, Avatar, Box, Button, Card, CardBody, Paragraph, Select, Spinner } from 'grommet';
-import { Copy, Lock } from 'grommet-icons';
+import { Lock, Trophy } from 'grommet-icons';
 import { connect } from 'react-redux';
 import { loadLobbies, startTournament } from '../../actions';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import BotSelector from './BotSelector';
+import textToColor from '../../textToColor';
+import Copy from '../Copy';
 
-const PlayersList = ({ playerNames, points }) => <Accordion animate>
+const PlayersList = ({ playerNames, points, openPlayer }) => <Accordion animate>
     <AccordionPanel label="Players">
-        {playerNames.map(player =>
-            <Box key={player} align="center" justify="between" direction="row" gap="small">
-                <Avatar align="center"
-                        flex={false}
-                        justify="center"
-                        overflow="hidden"
-                        round="full"
-                        src={`https://identicon-api.herokuapp.com/${player.replaceAll(' ', '-')}/64?format=png`}/>
-                <Box align="center" justify="between" direction="row" gap="small">
-                    <Paragraph>{player}</Paragraph>
-                    <Paragraph>{points[player]}</Paragraph>
+        {playerNames
+            .sort((a, b) => points[b] - points[a])
+            .map(player =>
+                <Box key={player}
+                     onClick={() => openPlayer(player)}
+                     style={{ cursor: 'pointer' }}
+                     align="center"
+                     justify="between"
+                     direction="row"
+                     gap="small"
+                     pad="small">
+                    <Box direction="row" gap="small" align="center">
+                        <Avatar align="center"
+                                flex={false}
+                                justify="center"
+                                overflow="hidden"
+                                round="full"
+                                src={`https://identicon-api.herokuapp.com/${player.replaceAll(' ', '-')}/64?format=png`}/>
+                        <Paragraph color={textToColor(player)}>{player}</Paragraph>
+                    </Box>
+                    <Paragraph>
+                        {points[player] ? points[player] + ' points' : '⌛'}
+                    </Paragraph>
                 </Box>
-            </Box>
-        )}
+            )}
     </AccordionPanel>
 </Accordion>;
 
-const GamesList = ({ games, goToGame }) => {
+const PlayerInGame = ({ name, winner }) =>
+    <Paragraph size="small" margin="none" style={{ whiteSpace: 'nowrap' }}>
+        {winner === name ? <><b>{name}</b> <Trophy size="small"/></> : name}
+    </Paragraph>;
+
+const GamesList = ({ games, filter, setFilter }) => {
     const navigate = useNavigate();
     const [filteredGames, setFilteredGames] = useState(games);
-    const [filter, setFilter] = useState('All players');
     const [players, setPlayers] = useState([]);
 
     useEffect(() => {
@@ -44,22 +61,30 @@ const GamesList = ({ games, goToGame }) => {
     }, [games]);
 
     return <Accordion animate>
-        <AccordionPanel label="Games">
+        <AccordionPanel label="Games" >
             <Select
                 options={players}
                 value={filter}
                 onChange={({ option }) => setFilter(option)}
+                margin={{ 'bottom': 'small' }}
             />
-            <Box style={{ height: '320px', overflowY: 'scroll' }} pad="small">
+            <Box style={{ height: '320px', overflowY: 'scroll' }}>
                 {filteredGames.map(({ id, size, players, winner }) =>
-                    <Box key={id} align="center" justify="between" direction="row" gap="small"
-                         style={{ minHeight: '45px' }} border={{ side: 'bottom' }}>
-                        <Paragraph>
-                            {winner === players[0] ? <b>{players[0]}</b> : players[0]}
-                            &nbsp;vs&nbsp;
-                            {winner === players[1] ? <b>{players[1]}</b> : players[1]} ({size}x{size})
-                        </Paragraph>
-                        <Button label="Show" onClick={() => navigate(`games/${id}`)} plain/>
+                    <Box key={id} align="center"
+                         justify="between"
+                         direction="row"
+                         pad="small"
+                         gap="small"
+                         style={{ minHeight: '60px' }}
+                         border={{ side: 'bottom' }}>
+                        <Box direction="column">
+                            <PlayerInGame name={players[0]} winner={winner}/>
+                            <PlayerInGame name={players[1]} winner={winner}/>
+                        </Box>
+                        <Box direction="row" gap="small">
+                            <Paragraph size="small" color="#d1d1d1">{size}x{size}</Paragraph>
+                            <Button label="Show" onClick={() => navigate(`games/${id}`)} plain/>
+                        </Box>
                     </Box>
                 )}
             </Box>
@@ -67,8 +92,9 @@ const GamesList = ({ games, goToGame }) => {
     </Accordion>;
 };
 
-const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, startTournament }) =>
-    <Card background={{ 'color': 'white' }} fill="horizontal" pad="medium" width="medium" align="stretch">
+const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, startTournament }) => {
+    const [filter, setFilter] = useState('All players');
+    return <Card background={{ 'color': 'white' }} fill="horizontal" pad="medium" width="medium" align="stretch">
         <Box align="end" justify="center">
             {status !== 'OPEN' && <Lock/>}
         </Box>
@@ -79,11 +105,11 @@ const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, 
             </Box>
             <Box align="center" justify="center" direction="row" gap="small">
                 <Paragraph>{name}</Paragraph>
-                <Copy onClick={() => navigator.clipboard.writeText(name)} cursor="pointer"/>
+                <Copy text={name} />
             </Box>
             {status === 'OPEN' && <BotSelector lobby={name}/>}
-            {playerNames.length > 0 && <PlayersList playerNames={playerNames} points={points}/>}
-            {games.length > 0 && <GamesList games={games}/>}
+            {playerNames.length > 0 && <PlayersList playerNames={playerNames} points={points} openPlayer={setFilter}/>}
+            {games.length > 0 && <GamesList games={games} filter={filter} setFilter={setFilter}/>}
             {status === 'IN_GAME' && <Spinner alignSelf="center"/>}
             {
                 status === 'OPEN' &&
@@ -97,6 +123,7 @@ const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, 
             }
         </CardBody>
     </Card>;
+};
 
 
 export default connect(

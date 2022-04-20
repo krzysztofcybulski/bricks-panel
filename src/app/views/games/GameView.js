@@ -3,16 +3,23 @@ import { connect } from 'react-redux';
 import { loadGame } from '../../actions';
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CaretNext, CaretPrevious, Copy, PauseFill, PlayFill, Previous, Stop, Trophy } from 'grommet-icons';
+import { CaretNext, CaretPrevious, PauseFill, PlayFill, Previous, Stop, Trophy } from 'grommet-icons';
 import GameCanvas from './GameCanvas';
 import textToColor from '../../textToColor';
+import GameExplainer from './GameExplainer';
+import Copy from '../Copy';
 
 const Player = ({ name, winner }) =>
-    <Box align="center" justify="between" direction="column" gap="small">
-        <Avatar align="center" flex={false} justify="center" overflow="hidden" round="full"
-                src={`https://identicon-api.herokuapp.com/${name.replaceAll(" ", "-")}/64?format=png`}/>
-        <Box align="center" justify="center" direction="row" gap="small">
-            <Paragraph color={textToColor(name)}>{name}</Paragraph>
+    <Box align="center" direction="column" gap="small">
+        <Avatar align="center"
+                flex={false}
+                justify="center"
+                overflow="hidden"
+                round="full"
+                size="large"
+                src={`https://identicon-api.herokuapp.com/${name.replaceAll(' ', '-')}/128?format=png`}/>
+        <Box align="center" justify="start" >
+            <Paragraph color={textToColor(name)} style={{ fontWeight: 600 }}>{name}</Paragraph>
             {winner === name && <Trophy/>}
         </Box>
     </Box>;
@@ -23,6 +30,7 @@ const GameView = ({ game, loading, loadGame }) => {
     const navigate = useNavigate();
     const [time, setTime] = useState(0);
     const [playing, setPlaying] = useState(false);
+    const [currentBlock, setCurrentBlock] = useState();
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -44,19 +52,20 @@ const GameView = ({ game, loading, loadGame }) => {
     }
 
     return <Box justify="center" alignContent="center" height="100%">
-        <Card background={{ 'color': 'white' }} pad="medium" width="medium" alignSelf="center">
+        <Card background={{ 'color': 'white' }} pad="medium" width="large" alignSelf="center">
             <CardHeader align="stretch" direction="column" flex={false} justify="between" gap="medium" pad="small">
-                <Previous cursor="pointer" onClick={() => navigate('/')}/>
                 <Box align="center" justify="between" direction="row">
+                    <Previous cursor="pointer" onClick={() => navigate('/')}/>
                     <Paragraph size="small">{game.id}</Paragraph>
-                    <Copy cursor="pointer" onClick={() => navigator.clipboard.writeText(game.id)}/>
+                    <Copy />
                 </Box>
                 <Box direction="row" justify="between">
                     <Player name={game.firstPlayer} winner={game.winner}/>
                     <Player name={game.secondPlayer} winner={game.winner}/>
                 </Box>
-                <Box alignSelf="center">
-                    <GameCanvas time={time}/>
+                <Box alignSelf="center" align="center">
+                    <GameCanvas time={time} onHover={setCurrentBlock} currentBlock={currentBlock}/>
+                    <GameExplainer time={time} currentBlock={currentBlock} />
                 </Box>
                 <RangeInput
                     value={time}
