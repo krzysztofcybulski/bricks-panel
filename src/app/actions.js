@@ -1,6 +1,6 @@
 import { NotificationManager } from 'react-notifications';
 
-const api = process.env.API || 'http://bricks-api.kcybulski.me';
+const api = process.env.REACT_APP_API || 'http://bricks-api.kcybulski.me';
 
 export const loadLobbies = () => async (dispatch) => {
     const response = await fetch(api);
