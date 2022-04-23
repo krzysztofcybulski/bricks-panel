@@ -1,12 +1,13 @@
 import { Accordion, AccordionPanel, Avatar, Box, Button, Card, CardBody, Paragraph, Select, Spinner } from 'grommet';
 import { Lock, Trophy } from 'grommet-icons';
 import { connect } from 'react-redux';
-import { loadLobbies, startTournament } from '../../actions';
+import { loadLobbies } from '../../actions';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import BotSelector from './BotSelector';
 import textToColor from '../../textToColor';
 import Copy from '../Copy';
+import StartNewGame from './StartNewGame';
 
 const PlayersList = ({ playerNames, points, openPlayer }) => <Accordion animate>
     <AccordionPanel label="Players">
@@ -61,7 +62,7 @@ const GamesList = ({ games, filter, setFilter }) => {
     }, [games]);
 
     return <Accordion animate>
-        <AccordionPanel label="Games" >
+        <AccordionPanel label="Games">
             <Select
                 options={players}
                 value={filter}
@@ -105,17 +106,13 @@ const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, 
             </Box>
             <Box align="center" justify="center" direction="row" gap="small">
                 <Paragraph>{name}</Paragraph>
-                <Copy text={name} />
+                <Copy text={name}/>
             </Box>
             {status === 'OPEN' && <BotSelector lobby={name}/>}
             {playerNames.length > 0 && <PlayersList playerNames={playerNames} points={points} openPlayer={setFilter}/>}
             {games.length > 0 && <GamesList games={games} filter={filter} setFilter={setFilter}/>}
             {status === 'IN_GAME' && <Spinner alignSelf="center"/>}
-            {
-                status === 'OPEN' &&
-                playerNames.length >= 2 &&
-                <Button label="Start" onClick={() => startTournament({ lobby: name })}/>
-            }
+            {status === 'OPEN' && playerNames.length >= 2 && <StartNewGame lobby={name}/>}
             {
                 status === 'OPEN' &&
                 playerNames.length < 2 &&
@@ -132,7 +129,6 @@ export default connect(
         ...props
     }),
     dispatch => ({
-        loadLobbies: () => dispatch(loadLobbies()),
-        startTournament: ({ lobby }) => dispatch(startTournament({ lobby }))
+        loadLobbies: () => dispatch(loadLobbies())
     }))
 (LobbyCard);

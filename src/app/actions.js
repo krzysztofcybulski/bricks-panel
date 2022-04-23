@@ -22,17 +22,13 @@ export const loadBotNames = () => async (dispatch) => {
     });
 };
 
-export const startTournament = ({ lobby }) => async (dispatch) => {
+export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (dispatch) => {
     await fetch(`${api}/${lobby}/start`, {
-        method: 'POST' ,
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            sizes: [5, 10, 20],
-            initTime: 1000,
-            moveTime: 100
-        })
+        body: JSON.stringify({ sizes, initTime, moveTime })
     });
     await dispatch(loadLobbies());
     NotificationManager.info('New tournament started');
@@ -46,7 +42,7 @@ export const createNewLobby = () => async (dispatch) => {
 
 export const addBot = ({ lobby, name }) => async (dispatch) => {
     await fetch(`${api}/${lobby}/bots`, {
-        method: 'POST' ,
+        method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
@@ -82,7 +78,7 @@ export const loadGame = ({ id }) => async (dispatch) => {
             blocks: e.brick.blocks
         }));
 
-    const { result: { player: { name: winner }}} = events
+    const { result: { player: { name: winner } } } = events
         .find(e => e.type === 'GameEndedEvent')
         .rawPayload;
 

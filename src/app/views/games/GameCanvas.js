@@ -2,9 +2,9 @@ import { connect } from 'react-redux';
 import { Layer, Rect, Stage } from 'react-konva';
 import textToColor from '../../textToColor';
 
-const tileSize = 28;
 
 const GameCanvas = ({ blocks, size, onHover, currentBlock }) => {
+    const tileSize = Math.min(500 / size, 28);
     return <Stage width={size * tileSize} height={size * tileSize} backgroundColor="black">
         <Layer>
             <Rect x={0} y={0} height={size * tileSize} width={size * tileSize} fill="#f2f2f2"/>
