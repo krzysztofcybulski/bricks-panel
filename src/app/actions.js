@@ -3,7 +3,7 @@ import { NotificationManager } from 'react-notifications';
 const api = process.env.REACT_APP_API || 'https://bricks-game.herokuapp.com';
 
 export const loadLobbies = () => async (dispatch) => {
-    const response = await fetch(api);
+    const response = await fetch(`${api}/lobbies`);
     const lobbies = await response.json();
     await dispatch({
         type: 'LOBBIES_LOADED',
@@ -23,7 +23,7 @@ export const loadBotNames = () => async (dispatch) => {
 };
 
 export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (dispatch) => {
-    await fetch(`${api}/${lobby}/start`, {
+    await fetch(`${api}/${lobby}/tournaments`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -35,7 +35,7 @@ export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (
 };
 
 export const createNewLobby = () => async (dispatch) => {
-    await fetch(api, { method: 'POST' });
+    await fetch(`${api}/lobbies`, { method: 'POST' });
     await dispatch(loadLobbies());
     NotificationManager.info('New lobby added');
 };
