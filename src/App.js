@@ -1,10 +1,11 @@
 import BackgroundView from './app/views/BackgroundView';
 import { Outlet } from 'react-router-dom';
-import NotificationContainer from 'react-notifications/lib/NotificationContainer';
+import MessageDispatcher from './app/views/MessageDispatcher';
 
 const App = () => <BackgroundView>
-    <NotificationContainer />
-    <Outlet/>
+    <MessageDispatcher>
+        <Outlet/>
+    </MessageDispatcher>
 </BackgroundView>;
 
 export default App;

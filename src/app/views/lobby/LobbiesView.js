@@ -5,11 +5,8 @@ import { loadBotNames, loadLobbies, onMessage } from '../../actions';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 import useWindowDimensions from '../useWindowDimensions';
-import { wsAddress } from '../../api';
 
-const ws = new WebSocket(`${wsAddress}/lobbies/updates`);
-
-const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, onMessage }) => {
+const LobbiesView = ({ loading, lobbies }) => {
 
     const { width } = useWindowDimensions();
     const [columnWidth, setColumnWidth] = useState('30%');
@@ -21,21 +18,6 @@ const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, onMessage }) => 
             setColumnWidth('33.33%');
         }
     }, [width]);
-
-    useEffect(() => {
-        loadLobbies();
-    }, [loadLobbies]);
-
-    useEffect(() => {
-        loadBots();
-    }, [loadBots]);
-
-    useEffect(() => {
-        ws.onmessage = event => {
-            onMessage(JSON.parse(event.data));
-        };
-        return () => ws.close();
-    }, [onMessage]);
 
     if (loading) {
         return <Spinner alignSelf="center"/>;
@@ -57,10 +39,5 @@ export default connect(
     (state) => ({
         loading: !state.lobbies,
         lobbies: state.lobbies
-    }),
-    dispatch => ({
-        loadLobbies: () => dispatch(loadLobbies()),
-        loadBots: () => dispatch(loadBotNames()),
-        onMessage: (message) => dispatch(onMessage(message))
     }))
 (LobbiesView);
