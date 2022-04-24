@@ -1,9 +1,8 @@
 import { NotificationManager } from 'react-notifications';
-
-const api = process.env.REACT_APP_API || 'https://bricks-game.herokuapp.com';
+import { address } from './api';
 
 export const loadLobbies = () => async (dispatch) => {
-    const response = await fetch(`${api}/lobbies`);
+    const response = await fetch(`${address}/lobbies`);
     const lobbies = await response.json();
     await dispatch({
         type: 'LOBBIES_LOADED',
@@ -14,7 +13,7 @@ export const loadLobbies = () => async (dispatch) => {
 };
 
 export const loadBotNames = () => async (dispatch) => {
-    const response = await fetch(`${api}/bots`);
+    const response = await fetch(`${address}/bots`);
     const bots = await response.json();
     await dispatch({
         type: 'BOTS_LOADED',
@@ -23,7 +22,7 @@ export const loadBotNames = () => async (dispatch) => {
 };
 
 export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (dispatch) => {
-    await fetch(`${api}/lobbies/${lobby}/tournaments`, {
+    await fetch(`${address}/lobbies/${lobby}/tournaments`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -35,13 +34,13 @@ export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (
 };
 
 export const createNewLobby = () => async (dispatch) => {
-    await fetch(`${api}/lobbies`, { method: 'POST' });
+    await fetch(`${address}/lobbies`, { method: 'POST' });
     await dispatch(loadLobbies());
     NotificationManager.info('New lobby added');
 };
 
 export const addBot = ({ lobby, name }) => async (dispatch) => {
-    await fetch(`${api}/lobbies/${lobby}/bots`, {
+    await fetch(`${address}/lobbies/${lobby}/bots`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -59,7 +58,7 @@ export const loadGame = ({ id }) => async (dispatch) => {
         type: 'LOADING_GAME'
     });
 
-    const response = await fetch(`${api}/games/${id}/events`);
+    const response = await fetch(`${address}/games/${id}/events`);
     const events = await response.json();
 
     const {

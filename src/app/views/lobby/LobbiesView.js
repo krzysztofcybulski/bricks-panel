@@ -5,8 +5,9 @@ import { loadBotNames, loadLobbies, reportPings } from '../../actions';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 import useWindowDimensions from '../useWindowDimensions';
+import { wsAddress } from '../../api';
 
-const ws = new WebSocket('ws://localhost:5070/lobbies/updates');
+const ws = new WebSocket(`${wsAddress}/lobbies/updates`);
 
 const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, reportPings }) => {
 
