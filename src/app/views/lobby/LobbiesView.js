@@ -1,13 +1,14 @@
 import { Box, Spinner } from 'grommet';
 import LobbyCard from './LobbyCard';
 import { useEffect, useState } from 'react';
-import { loadBotNames, loadLobbies } from '../../actions';
+import { loadBotNames, loadLobbies, reportPings } from '../../actions';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 import useWindowDimensions from '../useWindowDimensions';
 
+const ws = new WebSocket('ws://localhost:5070/lobbies/updates');
 
-const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots }) => {
+const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, reportPings }) => {
 
     const { width } = useWindowDimensions();
     const [columnWidth, setColumnWidth] = useState('30%');
@@ -28,6 +29,13 @@ const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots }) => {
     useEffect(() => {
         loadBots();
     }, [loadBots]);
+
+    useEffect(() => {
+        ws.onmessage = event => {
+            reportPings({ pings: JSON.parse(event.data) });
+        };
+        return () => ws.close();
+    }, [reportPings]);
 
     if (loading) {
         return <Spinner alignSelf='center'/>;
@@ -52,6 +60,7 @@ export default connect(
     }),
     dispatch => ({
         loadLobbies: () => dispatch(loadLobbies()),
-        loadBots: () => dispatch(loadBotNames())
+        loadBots: () => dispatch(loadBotNames()),
+        reportPings: ({ pings }) => dispatch(reportPings({ pings }))
     }))
 (LobbiesView);

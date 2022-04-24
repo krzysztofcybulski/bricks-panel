@@ -8,8 +8,9 @@ import BotSelector from './BotSelector';
 import textToColor from '../../textToColor';
 import Copy from '../Copy';
 import StartNewGame from './StartNewGame';
+import { WifiMedium } from 'grommet-icons/es6';
 
-const PlayersList = ({ playerNames, points, openPlayer }) => <Accordion animate>
+const PlayersList = ({ playerNames, pings, points, openPlayer }) => <Accordion animate>
     <AccordionPanel label="Players">
         {playerNames
             .sort((a, b) => points[b] - points[a])
@@ -31,9 +32,8 @@ const PlayersList = ({ playerNames, points, openPlayer }) => <Accordion animate>
                                 src={`https://identicon-api.herokuapp.com/${player.replaceAll(' ', '-')}/64?format=png`}/>
                         <Paragraph color={textToColor(player)}>{player}</Paragraph>
                     </Box>
-                    <Paragraph>
-                        {points[player] ? points[player] + ' points' : '⌛'}
-                    </Paragraph>
+                    { points[player] && <Paragraph>{points[player]}</Paragraph> }
+                    { !points[player] && pings[player] && <Paragraph size="small"><WifiMedium size="small" /> {pings[player]}</Paragraph>}
                 </Box>
             )}
     </AccordionPanel>
@@ -93,7 +93,7 @@ const GamesList = ({ games, filter, setFilter }) => {
     </Accordion>;
 };
 
-const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, startTournament }) => {
+const LobbyCard = ({ pings, lobby: { name, status, games, points, playerNames } }) => {
     const [filter, setFilter] = useState('All players');
     return <Card background={{ 'color': 'white' }} fill="horizontal" pad="medium" width="medium" align="stretch">
         <Box align="end" justify="center">
@@ -109,7 +109,7 @@ const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, 
                 <Copy text={name}/>
             </Box>
             {status === 'OPEN' && <BotSelector lobby={name}/>}
-            {playerNames.length > 0 && <PlayersList playerNames={playerNames} points={points} openPlayer={setFilter}/>}
+            {playerNames.length > 0 && <PlayersList playerNames={playerNames} pings={pings} points={points} openPlayer={setFilter}/>}
             {games.length > 0 && <GamesList games={games} filter={filter} setFilter={setFilter}/>}
             {status === 'IN_GAME' && <Spinner alignSelf="center"/>}
             {status === 'OPEN' && playerNames.length >= 2 && <StartNewGame lobby={name}/>}
@@ -124,8 +124,9 @@ const LobbyCard = ({ bots, lobby: { name, status, games, points, playerNames }, 
 
 
 export default connect(
-    ({ bots }, props) => ({
+    ({ bots, pings }, props) => ({
         bots,
+        pings,
         ...props
     }),
     dispatch => ({
