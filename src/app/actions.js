@@ -97,7 +97,10 @@ export const reportPings = ({ pings: { players } }) => {
 };
 
 export const onMessage = ({ type, ...message }) => async (dispatch) => {
-    if(type === 'PLAYER_JOINED') {
+    if(type === 'GAME_ENDED') {
+        await dispatch(loadLobbies());
+        NotificationManager.info(`${message.gameId} game ended`);
+    } if(type === 'PLAYER_JOINED') {
         await dispatch(loadLobbies());
         NotificationManager.info(`${message.player} joined`);
     } else if(type === 'PLAYER_LEFT') {
