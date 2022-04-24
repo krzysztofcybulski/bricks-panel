@@ -1,7 +1,6 @@
 import { Box, Spinner } from 'grommet';
 import LobbyCard from './LobbyCard';
 import { useEffect, useState } from 'react';
-import { loadBotNames, loadLobbies, onMessage } from '../../actions';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 import useWindowDimensions from '../useWindowDimensions';
