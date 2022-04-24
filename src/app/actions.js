@@ -1,7 +1,6 @@
 import { NotificationManager } from 'react-notifications';
 
-// const api = process.env.REACT_APP_API || 'https://bricks-game.herokuapp.com';
-const api = 'http://localhost:5070';
+const api = process.env.REACT_APP_API || 'https://bricks-game.herokuapp.com';
 
 export const loadLobbies = () => async (dispatch) => {
     const response = await fetch(`${api}/lobbies`);
