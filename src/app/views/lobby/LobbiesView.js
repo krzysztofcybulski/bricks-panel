@@ -1,7 +1,7 @@
 import { Box, Spinner } from 'grommet';
 import LobbyCard from './LobbyCard';
 import { useEffect, useState } from 'react';
-import { loadBotNames, loadLobbies, reportPings } from '../../actions';
+import { loadBotNames, loadLobbies, onMessage } from '../../actions';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 import useWindowDimensions from '../useWindowDimensions';
@@ -9,13 +9,13 @@ import { wsAddress } from '../../api';
 
 const ws = new WebSocket(`${wsAddress}/lobbies/updates`);
 
-const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, reportPings }) => {
+const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, onMessage }) => {
 
     const { width } = useWindowDimensions();
     const [columnWidth, setColumnWidth] = useState('30%');
 
     useEffect(() => {
-        if(width < 1400) {
+        if (width < 1400) {
             setColumnWidth('50%');
         } else {
             setColumnWidth('33.33%');
@@ -23,8 +23,7 @@ const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, reportPings }) =
     }, [width]);
 
     useEffect(() => {
-        const interval = setInterval(() => loadLobbies(), 3000);
-        return () => clearInterval(interval);
+        loadLobbies();
     }, [loadLobbies]);
 
     useEffect(() => {
@@ -33,13 +32,13 @@ const LobbiesView = ({ loading, lobbies, loadLobbies, loadBots, reportPings }) =
 
     useEffect(() => {
         ws.onmessage = event => {
-            reportPings({ pings: JSON.parse(event.data) });
+            onMessage(JSON.parse(event.data));
         };
         return () => ws.close();
-    }, [reportPings]);
+    }, [onMessage]);
 
     if (loading) {
-        return <Spinner alignSelf='center'/>;
+        return <Spinner alignSelf="center"/>;
     }
 
     return <Box direction="row" alignContent="center" wrap fill={true} pad="xlarge">
@@ -62,6 +61,6 @@ export default connect(
     dispatch => ({
         loadLobbies: () => dispatch(loadLobbies()),
         loadBots: () => dispatch(loadBotNames()),
-        reportPings: ({ pings }) => dispatch(reportPings({ pings }))
+        onMessage: (message) => dispatch(onMessage(message))
     }))
 (LobbiesView);

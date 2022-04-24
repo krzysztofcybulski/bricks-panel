@@ -29,14 +29,10 @@ export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (
         },
         body: JSON.stringify({ sizes, initTime, moveTime })
     });
-    await dispatch(loadLobbies());
-    NotificationManager.info('New tournament started');
 };
 
 export const createNewLobby = () => async (dispatch) => {
     await fetch(`${address}/lobbies`, { method: 'POST' });
-    await dispatch(loadLobbies());
-    NotificationManager.info('New lobby added');
 };
 
 export const addBot = ({ lobby, name }) => async (dispatch) => {
@@ -49,8 +45,6 @@ export const addBot = ({ lobby, name }) => async (dispatch) => {
             name
         })
     });
-    await dispatch(loadLobbies());
-    NotificationManager.info('Bot added to lobby');
 };
 
 export const loadGame = ({ id }) => async (dispatch) => {
@@ -100,4 +94,26 @@ export const reportPings = ({ pings: { players } }) => {
         type: 'UPDATE_PINGS',
         pings: players
     });
+};
+
+export const onMessage = ({ type, ...message }) => async (dispatch) => {
+    if(type === 'PLAYER_JOINED') {
+        await dispatch(loadLobbies());
+        NotificationManager.info(`${message.player} joined`);
+    } else if(type === 'PLAYER_LEFT') {
+        await dispatch(loadLobbies());
+        NotificationManager.info(`${message.player} left`);
+    } else if(type === 'LOBBY_ADDED') {
+        await dispatch(loadLobbies());
+        NotificationManager.info(`${message.lobby} lobby added`);
+    } else if(type === 'TOURNAMENT_STARTED') {
+        await dispatch(loadLobbies());
+        NotificationManager.info(`New tournament started`);
+    } else if(type === 'TOURNAMENT_ENDED') {
+        await dispatch(loadLobbies());
+        NotificationManager.info(`Tournament ended`);
+    }
+    else if(type === 'REPORT_PING') {
+        await dispatch(reportPings({ pings: message }));
+    }
 };
