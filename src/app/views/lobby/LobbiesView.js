@@ -4,14 +4,19 @@ import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import NewLobbyCard from './NewLobbyCard';
 import useWindowDimensions from '../useWindowDimensions';
+import { useAuth0 } from "@auth0/auth0-react";
 
 const LobbiesView = ({ loading, lobbies }) => {
 
     const { width } = useWindowDimensions();
     const [columnWidth, setColumnWidth] = useState('30%');
+    const { isAuthenticated, getAccessTokenSilently } = useAuth0();
 
     useEffect(() => {
-        if (width < 1400) {
+        if(width < 750) {
+            setColumnWidth('100%');
+        }
+        else if (width < 1400) {
             setColumnWidth('50%');
         } else {
             setColumnWidth('33.33%');
@@ -28,9 +33,11 @@ const LobbiesView = ({ loading, lobbies }) => {
                 <LobbyCard lobby={lobby}/>
             </Box>
         )}
-        <Box pad="small" width={columnWidth} fill={false} flex="shrink">
-            <NewLobbyCard/>
-        </Box>
+        {isAuthenticated &&
+            <Box pad="small" width={columnWidth} fill={false} flex="shrink">
+                <NewLobbyCard/>
+            </Box>
+        }
     </Box>;
 };
 

@@ -11,15 +11,14 @@ const BotSelector = ({ botNames, addBot }) => {
     }, [botNames]);
 
     return <Box direction="row" gap="medium">
-        <Box>
+        <Box flex={{ grow: 1, shrink: 1}}>
             <Select
                 options={botNames}
                 value={bot}
                 onChange={({ option }) => setBot(option)}
-                flex="grow"
             />
         </Box>
-        <Box justify="center">
+        <Box justify="center" flex="grow">
             <Button label="Add" onClick={() => addBot({ name: bot })} plain/>
         </Box>
     </Box>;

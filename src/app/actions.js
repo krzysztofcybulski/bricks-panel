@@ -25,21 +25,29 @@ export const startTournament = ({ lobby, sizes, initTime, moveTime }) => async (
     await fetch(`${address}/lobbies/${lobby}/tournaments`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ sizes, initTime, moveTime })
     });
 };
 
 export const createNewLobby = () => async (dispatch) => {
-    await fetch(`${address}/lobbies`, { method: 'POST' });
+    await fetch(`${address}/lobbies`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
 };
 
 export const addBot = ({ lobby, name }) => async (dispatch) => {
     await fetch(`${address}/lobbies/${lobby}/bots`, {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({
             name
@@ -119,4 +127,17 @@ export const onMessage = ({ type, ...message }) => async (dispatch) => {
     else if(type === 'REPORT_PING') {
         await dispatch(reportPings({ pings: message }));
     }
+};
+
+export const generateApiKey = async () => {
+    const response = await fetch(`${address}/keys`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+    });
+    const { raw } = await response.json();
+    NotificationManager.info("Generated new api key");
+    return raw;
 };
